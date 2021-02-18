@@ -1,6 +1,6 @@
 'use strict';
 
-const { prop, isNil } = require('lodash/fp');
+const { prop, isNil, getOr, difference } = require('lodash/fp');
 const { isRelationalAttribute } = require('strapi-utils').contentTypes;
 const { getService } = require('../utils');
 
@@ -64,9 +64,15 @@ const getNewLocalizationsFor = async ({ relatedEntityId, model, locale }) => {
   return [relatedEntity.id, ...relatedEntity.localizations.map(prop('id'))];
 };
 
+const getLocalizedFields = model => {
+  const nonLocalizedFields = getNonLocalizedFields(model);
+  return difference(Object.keys(getOr({}, 'attributes', model)), nonLocalizedFields);
+};
+
 module.exports = {
   isLocalized,
   getNonLocalizedFields,
   addLocale,
   getNewLocalizationsFor,
+  getLocalizedFields,
 };
