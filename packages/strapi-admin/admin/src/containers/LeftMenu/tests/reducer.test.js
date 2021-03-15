@@ -22,7 +22,7 @@ describe('ADMIN | LeftMenu | reducer', () => {
         ok: true,
       };
       const action = {
-        type: 'TOGGLE_IS_LOADING',
+        type: 'StrapiAdmin/LeftMenu/TOGGLE_IS_LOADING',
       };
 
       expect(reducer(state, action)).toEqual(expected);
@@ -92,7 +92,7 @@ describe('ADMIN | LeftMenu | reducer', () => {
         ],
       };
       const action = {
-        type: 'SET_LINK_PERMISSIONS',
+        type: 'StrapiAdmin/LeftMenu/SET_LINK_PERMISSIONS',
         data: {
           generalSectionLinks: [
             {

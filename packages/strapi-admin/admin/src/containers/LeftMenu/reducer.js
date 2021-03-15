@@ -1,8 +1,14 @@
 /* eslint-disable consistent-return */
 import produce from 'immer';
-import { set } from 'lodash';
 import { SETTINGS_BASE_URL } from '../../config';
 import adminPermissions from '../../permissions';
+import {
+  SET_CT_OR_ST_LINKS,
+  SET_SECTION_LINKS,
+  TOGGLE_IS_LOADING,
+  SET_SETTING_LINKS_PERMISSIONS,
+  SET_SETTING_LINKS_NOTIF_COUNT,
+} from './constants';
 
 const initialState = {
   collectionTypesSectionLinks: [],
@@ -39,29 +45,40 @@ const initialState = {
   isLoading: true,
 };
 
-const reducer = (state, action) =>
+const reducer = (state = initialState, action) =>
   produce(state, draftState => {
     switch (action.type) {
-      case 'GET_MODELS_SUCCEEDED': {
-        Object.keys(action.data).forEach(modelType => {
-          set(draftState, [modelType], action.data[modelType]);
-        });
+      case SET_CT_OR_ST_LINKS: {
+        const { authorizedCtLinks, authorizedStLinks } = action.data;
+        draftState.collectionTypesSectionLinks = authorizedCtLinks;
+        draftState.singleTypesSectionLinks = authorizedStLinks;
         break;
       }
-      case 'SET_LINK_PERMISSIONS': {
-        Object.keys(action.data).forEach(sectionName => {
-          const sectionData = action.data[sectionName];
 
-          sectionData.forEach(result => {
-            set(draftState, [sectionName, result.index, 'isDisplayed'], result.hasPermission);
-          });
-        });
+      case SET_SECTION_LINKS: {
+        const { authorizedGeneralLinks, authorizedPluginLinks } = action.data;
+        draftState.generalSectionLinks = authorizedGeneralLinks;
+        draftState.pluginsSectionLinks = authorizedPluginLinks;
         break;
       }
-      case 'TOGGLE_IS_LOADING': {
+
+      case TOGGLE_IS_LOADING: {
         draftState.isLoading = false;
         break;
       }
+
+      case SET_SETTING_LINKS_PERMISSIONS: {
+        const { index, permission } = action.data;
+        draftState.generalSectionLinks[index].permission = permission;
+        break;
+      }
+
+      case SET_SETTING_LINKS_NOTIF_COUNT: {
+        const { index, notifCount } = action.data;
+        draftState.generalSectionLinks[index].notificationsCount = notifCount;
+        break;
+      }
+
       default:
         return draftState;
     }
