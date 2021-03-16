@@ -68,7 +68,14 @@ module.exports = function(strapi) {
         database,
         srv,
         useUnifiedTopology,
+        //new props for connect to DocumentDB (AWS)
+        pathCert,
+        sslValidate,
+        useNewUrlParser,
       } = connection.settings;
+
+      //obtener certificado
+      var ca = [fs.readFileSync(pathCert)];
 
       // eslint-disable-next-line node/no-deprecated-api
       const uriOptions = uri ? url.parse(uri, true).query : {};
@@ -110,7 +117,17 @@ module.exports = function(strapi) {
 
         const connectionString = uri || connectionURL.toString();
 
-        await instance.connect(connectionString, connectOptions);
+        // incorporar a la configuracion
+        /**
+         *  sslValidate: true,
+          sslCA: ca,
+          useNewUrlParser: true,
+         */
+        await instance.connect(connectionString, {
+          sslValidate,
+          sslCA: ca,
+          useNewUrlParser,
+        });
       } catch (error) {
         const err = new Error(`Error connecting to the Mongo database. ${error.message}`);
         delete err.stack;
